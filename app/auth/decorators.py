@@ -10,9 +10,14 @@ def require_token(func):
         try:
             payload = decode_access_token(token)
             print(f"Token valide pour l'utilisateur : {payload['emp_number']}")
-            return func(*args, **kwargs)
         except Exception as e:
             print(f"Token invalide ou expiré : {str(e)}")
+            return
+        
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(f"Erreur lors de l'exécution de la fonction : {str(e)}")
             return
     return wrapper
 
