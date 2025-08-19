@@ -17,15 +17,18 @@ def get_customers_by(session, attribute, value):
     if not hasattr(Customer, attribute):
         raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Customer.")
 
-    return session.query(Customer).filter(getattr(Customer, attribute) == value).all()
+    if value.lower() in ("none", "null"):
+        return session.query(Customer).filter(getattr(Customer, attribute).is_(None)).all()
+    else:
+        return session.query(Customer).filter(getattr(Customer, attribute) == value).all()
 
 def update_customer_by_id(session, customer_id, attribute, value):
     if not hasattr(Customer, attribute):
         raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Customer.")
     
     if attribute == "sale_contact":
-        raise ValueError(f"L'attribut 'sale_contact' ne peut être mis à jour que par le département gestion.")
-    
+        raise ValueError(f"Veuillez utiliser la fonction 'update_customer_sale_contact' pour mettre à jour le contact commercial.")
+
     if attribute not in ['first_name', 'last_name', 'email', 'phone', 'company']:
         raise ValueError(f"L'attribut '{attribute}' ne peut pas être mis à jour directement.")
     
@@ -56,4 +59,14 @@ def update_customer_sale_contact(session, customer_id, sale_contact_number):
     customer.sale_contact_id = sale_contact.id
     session.commit()
     session.refresh(customer)
+    return customer
+
+def delete_customer_by_id(session, customer_id):
+    customer = session.query(Customer).filter(Customer.id == customer_id).first()
+    
+    if not customer:
+        raise ValueError(f"Aucun client trouvé avec l'ID {customer_id}.")
+
+    session.delete(customer)
+    session.commit()
     return customer
