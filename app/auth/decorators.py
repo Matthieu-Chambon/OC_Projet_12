@@ -1,23 +1,27 @@
 from app.auth.session import load_token
 from app.auth.token import decode_access_token
 
+from rich.console import Console
+from rich.text import Text
+
 def require_token(func):
     def wrapper(*args, **kwargs):
         token = load_token()
+        console = Console()
         if not token:
-            print("Aucun token trouvé. Veuillez vous connecter.")
+            console.print(Text("Aucun token trouvé. Veuillez vous connecter.", style="red"))
             return
         try:
             payload = decode_access_token(token)
-            print(f"Token valide pour l'utilisateur : {payload['emp_number']}")
+            console.print(Text(f"Token valide pour l'utilisateur : {payload['emp_number']}", style="green"))
         except Exception as e:
-            print(f"Token invalide ou expiré : {str(e)}")
+            console.print(Text(f"Token invalide ou expiré : {str(e)}", style="red"))
             return
         
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(f"Erreur lors de l'exécution de la fonction : {str(e)}")
+            console.print(Text(f"Erreur lors de l'exécution de la fonction : {str(e)}", style="red"))
             return
     return wrapper
 
@@ -25,11 +29,12 @@ def require_sale_role(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
+        console = Console()
         if payload['role_id'] == 1:
-            print("Accès autorisé (Commercial)")
+            console.print(Text("Accès autorisé (Commercial)", style="green"))
             return func(*args, **kwargs)
         else:
-            print("Accès refusé : cette action est réservée au département commercial.")
+            console.print(Text("Accès refusé : cette action est réservée au département commercial.", style="red"))
             return
     return wrapper
 
@@ -37,11 +42,12 @@ def require_support_role(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
+        console = Console()
         if payload['role_id'] == 2:
-            print("Accès autorisé (Support)")
+            console.print(Text("Accès autorisé (Support)", style="green"))
             return func(*args, **kwargs)
         else:
-            print("Accès refusé : cette action est réservée au département support.")
+            console.print(Text("Accès refusé : cette action est réservée au département support.", style="red"))
             return
     return wrapper
 
@@ -49,10 +55,11 @@ def require_management_role(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
+        console = Console()
         if payload['role_id'] == 3:
-            print("Accès autorisé (Gestion)")
+            console.print(Text("Accès autorisé (Gestion)", style="green"))
             return func(*args, **kwargs)
         else:
-            print("Accès refusé : cette action est réservée au département gestion.")
+            console.print(Text("Accès refusé : cette action est réservée au département gestion.", style="red"))
             return
     return wrapper
