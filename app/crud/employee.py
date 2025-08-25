@@ -20,39 +20,67 @@ def create_employee(session, data):
         return new_employee
     except Exception as e:
         raise ValueError(f"Erreur lors de la création de l'employé : {e}")
-    
-def get_all_employees(session):
-    return session.query(Employee).all()
-    
-def get_employees_by(session, attribute, value):
-    if not hasattr(Employee, attribute):
-        raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Employee.")
-    
-    return session.query(Employee).filter(getattr(Employee, attribute) == value).all()
 
-def update_employee_by_number(session, employee_number, attribute, value):
-    if not hasattr(Employee, attribute):
-        raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Employee.")
-    
-    if attribute == "password":
-        raise ValueError("Veuillez utiliser la fonction 'change_password' pour modifier le mot de passe.")
+def get_employees(session, filters, sorts):
+    query = session.query(Employee)
 
-    if not attribute in ['first_name', 'last_name', 'email', 'role_id']:
-        raise ValueError(f"L'attribut '{attribute}' n'est pas modifiable.")
-    
-    if attribute == "role_id" and value not in ["1", "2", "3"]:
-        raise ValueError("L'ID de rôle doit être 1 (Commercial), 2 (Support) ou 3 (Gestion).")
+    for attr, value in filters.items():
+        if not hasattr(Employee, attr):
+            raise ValueError(f"L'attribut '{attr}' n'existe pas dans le modèle Employee.")
 
-    employee = session.query(Employee).filter(Employee.employee_number == employee_number).first()
+        column = getattr(Employee, attr)
+
+        if value.lower() in ("none", "null"):
+            query = query.filter(column.is_(None))
+            continue
+
+        if value.lower() in ("true", "false"):
+            query = query.filter(column.is_(value.lower() == "true"))
+            continue
+
+        query = query.filter(column.contains(value))
+
+    if sorts:
+        for attr, order in sorts.items():
+            if not hasattr(Employee, attr):
+                raise ValueError(f"L'attribut '{attr}' n'existe pas dans le modèle Employee.")
+            
+            column = getattr(Employee, attr)
+            
+            if order == "asc":
+                query = query.order_by(column.asc())
+            elif order == "desc":
+                query = query.order_by(column.desc())
     
+    return query.all()
+
+def update_employee(session, employee_number_or_id, updates):
+    employee = session.query(Employee).filter(
+        (Employee.employee_number == employee_number_or_id) | (Employee.id == employee_number_or_id)
+    ).first()
+
     if not employee:
-        raise ValueError(f"Aucun employé trouvé avec le numéro {employee_number}.")
+        raise ValueError(f"Aucun employé trouvé avec le numéro ou id {employee_number_or_id}.")
+
+    for attribute, value in updates.items():
+        if not hasattr(Employee, attribute):
+            raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Employee.")
         
-    setattr(employee, attribute, value)
+        if attribute == "password":
+            raise ValueError("Veuillez utiliser la commande 'change-password' pour modifier le mot de passe.")
+        
+        if not attribute in ['first_name', 'last_name', 'email', 'role_id']:
+            raise ValueError(f"L'attribut '{attribute}' n'est pas modifiable.")
+        
+        if attribute == "role_id" and value not in ["1", "2", "3"]:
+            raise ValueError("L'ID de rôle doit être 1 (Commercial), 2 (Support) ou 3 (Gestion).")
+        
+        setattr(employee, attribute, value)
+
     session.commit()
     session.refresh(employee)
     return employee
-        
+
 def update_password(session, employee_number, new_password):
     employee = session.query(Employee).filter(Employee.employee_number == employee_number).first()
     
@@ -63,6 +91,6 @@ def update_password(session, employee_number, new_password):
     session.commit()
     return True
     
-def delete_employee_by_number(session, employee):
+def delete_employee(session, employee):
     session.delete(employee)
     session.commit()
