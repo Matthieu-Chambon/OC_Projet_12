@@ -48,8 +48,10 @@ def update_customer(session, customer_id, updates, req_emp_num):
 
     if not customer:
         raise ValueError(f"Aucun client trouvé avec l'ID {customer_id}.")
+    
+    employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
 
-    if customer.sale_contact.employee_number != req_emp_num:
+    if customer.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
         raise ValueError(f"Vous n'êtes pas le commercial associé à ce client.")
 
     for attribute, value in updates.items():

@@ -25,7 +25,7 @@ def require_token(func):
             return
     return wrapper
 
-def require_sale_role(func):
+def is_salesperson_or_manager(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
@@ -33,12 +33,15 @@ def require_sale_role(func):
         if payload['role_id'] == 1:
             console.print(Text("Accès autorisé (Commercial)", style="green"))
             return func(*args, **kwargs)
+        elif payload['role_id'] == 3:
+            console.print(Text("Accès autorisé (Gestion)", style="green"))
+            return func(*args, **kwargs)
         else:
             console.print(Text("Accès refusé : cette action est réservée au département commercial.", style="red"))
             return
     return wrapper
 
-def require_support_role(func):
+def is_support_or_manager(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
@@ -46,12 +49,15 @@ def require_support_role(func):
         if payload['role_id'] == 2:
             console.print(Text("Accès autorisé (Support)", style="green"))
             return func(*args, **kwargs)
+        elif payload['role_id'] == 3:
+            console.print(Text("Accès autorisé (Gestion)", style="green"))
+            return func(*args, **kwargs)
         else:
             console.print(Text("Accès refusé : cette action est réservée au département support.", style="red"))
             return
     return wrapper
 
-def require_management_role(func):
+def is_manager(func):
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)

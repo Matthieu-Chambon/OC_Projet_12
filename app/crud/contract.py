@@ -48,9 +48,11 @@ def update_contract(session, contract_id, updates, req_emp_num):
 
     if not contract:
         raise ValueError(f"Aucun contrat trouvé avec l'ID {contract_id}.")
+    
+    employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
 
-    if contract.sale_contact.employee_number != req_emp_num:
-        raise ValueError(f"Vous n'êtes pas le commercial associé à ce client.")
+    if contract.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
+        raise ValueError(f"Vous n'êtes pas le commercial associé à ce contrat.")
     
     for attribute, value in updates.items():
         if not hasattr(Contract, attribute):

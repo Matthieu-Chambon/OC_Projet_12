@@ -53,7 +53,7 @@ def update_event(session, event_id, updates, req_emp_num):
     employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
     
     if event.support_contact.employee_number != req_emp_num or employee.role.name != "Management":
-        raise ValueError(f"Vous n'êtes pas manager ou l'employé responsable de cet événement.")
+        raise ValueError(f"Vous n'êtes pas l'employé responsable de cet événement.")
 
     for attribute, value in updates.items():
         if not hasattr(Event, attribute):

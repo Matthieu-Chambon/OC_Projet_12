@@ -11,7 +11,7 @@ from app.crud import (
 from app.auth.password import verify_password
 from app.auth.token import create_access_token, decode_access_token
 from app.auth.session import save_token_locally, load_token
-from app.auth.decorators import require_token, require_sale_role, require_support_role, require_management_role
+from app.auth.decorators import require_token, is_salesperson_or_manager, is_support_or_manager, is_manager
 
 from getpass import getpass
 from datetime import datetime
@@ -125,7 +125,7 @@ def employee():
 
 @employee.command("create")
 @require_token
-@require_management_role
+@is_manager
 def create_employee():
     """Créer un nouvel employé"""
     first_name = input_with_limit("Prénom : ", 100)
@@ -182,7 +182,6 @@ def create_employee():
     help="Critère de tri au format attribut=asc|desc.\nExemple: -s last_name=asc"
 )
 @require_token
-@require_management_role
 def get_employees(filter, sort):
     """Récupère la liste des employés en fonction des critères du filtrage et du tri."""
 
@@ -199,7 +198,7 @@ def get_employees(filter, sort):
 @click.argument("employee")
 @click.argument("update", nargs=-1, required=True)
 @require_token
-@require_management_role
+@is_manager
 def update_employee(employee, update):
     """
     Met à jour un employé.
@@ -217,12 +216,12 @@ def update_employee(employee, update):
 @employee.command("delete")
 @click.argument("employee")
 @require_token
-@require_management_role
+@is_manager
 def delete_employee(employee):
     """Supprime un employé."""
     
     if employee.isdigit():
-        employees = safe_execute(crud_employee.get_employees, db, {"id": int(employee)}, None)
+        employees = safe_execute(crud_employee.get_employees, db, {"id": employee}, None)
     else:
         employees = safe_execute(crud_employee.get_employees, db, {"employee_number": employee}, None)
    
@@ -255,7 +254,7 @@ def customer():
 
 @customer.command("create")
 @require_token
-@require_sale_role
+@is_salesperson_or_manager
 def create_customer():
     """Crée un nouveau client."""
     first_name = input_with_limit("Prénom du client : ", 100)
@@ -316,7 +315,7 @@ def get_customers(filter, sort):
 @click.argument("customer_id", type=int)
 @click.argument("update", nargs=-1, required=True)
 @require_token
-@require_sale_role
+@is_salesperson_or_manager
 def update_customer(customer_id, update):
     """
     Met à jour un client.
@@ -335,7 +334,7 @@ def update_customer(customer_id, update):
 @click.argument("customer_id", type=int)
 @click.argument("sale_contact")
 @require_token
-@require_management_role
+@is_manager
 def update_customer_sale_contact(customer_id, sale_contact):
     """
     Met à jour le contact commercial d'un client.
@@ -349,7 +348,7 @@ def update_customer_sale_contact(customer_id, sale_contact):
 @customer.command("delete")
 @click.argument("customer_id")
 @require_token
-@require_management_role
+@is_manager
 def delete_customer(customer_id):
     """
     Supprime un client.
@@ -388,7 +387,7 @@ def contract():
 
 @contract.command("create")
 @require_token
-@require_management_role
+@is_manager
 def create_contract():
     while True:
         customer_id = input(">>> ID du client : ")
@@ -504,7 +503,7 @@ def get_contracts(filter, sort):
 @click.argument("contract_id", type=int)
 @click.argument("update", nargs=-1, required=True)
 @require_token
-@require_sale_role
+@is_salesperson_or_manager
 def update_contract(contract_id, update):
     """
     Met à jour un contrat.
@@ -522,7 +521,7 @@ def update_contract(contract_id, update):
 @contract.command("delete")
 @click.argument("contract_id")
 @require_token
-@require_management_role
+@is_manager
 def delete_contract(contract_id):
     """
     Supprime un contrat.
@@ -560,8 +559,11 @@ def event():
 
 @event.command("create")
 @require_token
-@require_sale_role
+@is_salesperson_or_manager
 def create_event():
+    req_emp_num = decode_access_token(load_token())["emp_number"]
+    employee = safe_execute(crud_employee.get_employees, db, {"employee_number": req_emp_num}, None)[0]
+
     name = input_with_limit("Nom de l'événement : ", 100)
     
     while True:
@@ -578,7 +580,11 @@ def create_event():
         if contract.event:
             print(f"Un événement est déjà associé au contrat {contract_id}.")
             continue
-        
+
+        if contract.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
+            print(f"Vous n'êtes pas le commercial associé à ce contrat.")
+            continue
+
         if contract.signed is False:
             print(f"Le contrat {contract_id} n'est pas signé.")
             continue
@@ -674,6 +680,7 @@ def get_events(filter, sort):
 @click.argument("event_id", type=int)
 @click.argument("update", nargs=-1, required=True)
 @require_token
+@is_support_or_manager
 def update_event(event_id, update):
     """
     Met à jour un événement.
@@ -691,7 +698,7 @@ def update_event(event_id, update):
 @event.command("delete")
 @click.argument("event_id")
 @require_token
-@require_management_role
+@is_manager
 def delete_event(event_id):
     """
     Supprime un événement.
