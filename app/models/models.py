@@ -31,7 +31,7 @@ class Employee(Base):
     
     role = relationship("Role", back_populates="employees")
     customers: Mapped[list["Customer"]] = relationship("Customer", back_populates="sale_contact", passive_deletes=True)
-    contracts : Mapped[list["Contract"]] = relationship("Contract", back_populates="employee", passive_deletes=True)
+    contracts : Mapped[list["Contract"]] = relationship("Contract", back_populates="sale_contact", passive_deletes=True)
     events: Mapped[list["Event"]] = relationship("Event", back_populates="support_contact", passive_deletes=True)
 
     def __repr__(self):
@@ -70,7 +70,7 @@ class Contract(Base):
     created_at: Mapped[DateTime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=False)    
 
     customer = relationship("Customer", back_populates="contracts")
-    employee = relationship("Employee", back_populates="contracts")
+    sale_contact = relationship("Employee", back_populates="contracts")
     event = relationship("Event", back_populates="contract", uselist=False, passive_deletes=True)
     
     def __repr__(self):
