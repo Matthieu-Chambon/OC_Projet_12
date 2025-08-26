@@ -51,9 +51,13 @@ def update_contract(session, contract_id, updates, req_emp_num):
     
     employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
 
-    if contract.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
-        raise ValueError(f"Vous n'êtes pas le commercial associé à ce contrat.")
-    
+    if contract.sale_contact:
+        if contract.sale_contact.employee_number != req_emp_num and employee.role.name != "Management":
+            raise ValueError(f"Vous n'êtes pas autorisé à modifier ce contrat.")
+    else:
+        if employee.role.name != "Management":
+            raise ValueError(f"Seul un manager peut modifier le contrat s'il n'a pas de commercial associé.")
+
     for attribute, value in updates.items():
         if not hasattr(Contract, attribute):
             raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Contract.")

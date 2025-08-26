@@ -50,9 +50,13 @@ def update_customer(session, customer_id, updates, req_emp_num):
         raise ValueError(f"Aucun client trouvé avec l'ID {customer_id}.")
     
     employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
-
-    if customer.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
-        raise ValueError(f"Vous n'êtes pas le commercial associé à ce client.")
+    
+    if customer.sale_contact:
+        if customer.sale_contact.employee_number != req_emp_num and employee.role.name != "Management":
+            raise ValueError(f"Vous n'êtes pas autorisé à modifier ce client.")
+    else:
+        if employee.role.name != "Management":
+            raise ValueError(f"Seul un manager peut modifier le client s'il n'a pas de commercial associé.")
 
     for attribute, value in updates.items():
         if not hasattr(Customer, attribute):

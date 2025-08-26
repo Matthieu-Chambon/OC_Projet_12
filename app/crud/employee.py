@@ -67,7 +67,7 @@ def update_employee(session, employee_number_or_id, updates):
             raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Employee.")
         
         if attribute == "password":
-            raise ValueError("Veuillez utiliser la commande 'change-password' pour modifier le mot de passe.")
+            raise ValueError("Veuillez utiliser la commande 'employee update-password' pour modifier le mot de passe.")
         
         if not attribute in ['first_name', 'last_name', 'email', 'role_id']:
             raise ValueError(f"L'attribut '{attribute}' n'est pas modifiable.")
@@ -81,12 +81,7 @@ def update_employee(session, employee_number_or_id, updates):
     session.refresh(employee)
     return employee
 
-def update_password(session, employee_number, new_password):
-    employee = session.query(Employee).filter(Employee.employee_number == employee_number).first()
-    
-    if not employee:
-        raise ValueError(f"Aucun employé trouvé avec le numéro {employee_number}.")
-
+def update_password(session, employee, new_password):
     employee.password = hash_password(new_password)
     session.commit()
     return True
