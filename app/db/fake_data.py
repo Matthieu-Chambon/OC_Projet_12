@@ -102,7 +102,7 @@ contracts = [
         sale_contact_id=1, # Alice Dupont
         total_amount=2000.00,
         remaining_amount=1500.00,
-        signed=False
+        signed=True
     ),
     Contract(
         customer_id=3, # Frank Bernard
@@ -110,6 +110,13 @@ contracts = [
         total_amount=3000.00,
         remaining_amount=3000.00,
         signed=False
+    ),
+    Contract(
+        customer_id=3, # Frank Bernard
+        sale_contact_id=2, # Marie Curie
+        total_amount=6000.00,
+        remaining_amount=0.00,
+        signed=True
     )
 ]
 
@@ -122,7 +129,7 @@ events = [
         end_date="2023-06-21 23:00:00",
         location="Parc des Princes",
         attendees=100,
-        note="Concert de rock",
+        notes="Concert de rock",
     ),
     Event( # Pas de support_contact_id
         name="Réunion d'équipe",
@@ -131,7 +138,7 @@ events = [
         end_date="2023-06-22 12:00:00",
         location="Salle de conférence",
         attendees=10,
-        note="Discussion des objectifs du trimestre"
+        notes="Discussion des objectifs du trimestre"
     )
 ]
 
