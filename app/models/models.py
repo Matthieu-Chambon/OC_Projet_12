@@ -88,11 +88,11 @@ class Event(Base):
     end_date: Mapped[DateTime] = mapped_column(TIMESTAMP, nullable=True)
     location: Mapped[str] = mapped_column(String(255), nullable=True)
     attendees: Mapped[int] = mapped_column(Integer, nullable=True)
-    note: Mapped[str] = mapped_column(Text(255), nullable=True)
+    notes: Mapped[str] = mapped_column(Text(255), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(TIMESTAMP, server_default=func.now(), nullable=False)
     
     contract = relationship("Contract", back_populates="event")
     support_contact = relationship("Employee", back_populates="events")
 
     def __repr__(self):
-        return f"<Event(id={self.id}, name='{self.name}', contract_id={self.contract_id}, support_contact_id={self.support_contact_id}, start_date='{self.start_date}', end_date='{self.end_date}', location='{self.location}', attendees={self.attendees}, note='{self.note}')>"
+        return f"<Event(id={self.id}, name='{self.name}', contract_id={self.contract_id}, support_contact_id={self.support_contact_id}, start_date='{self.start_date}', end_date='{self.end_date}', location='{self.location}', attendees={self.attendees}, notes='{self.notes}')>"
