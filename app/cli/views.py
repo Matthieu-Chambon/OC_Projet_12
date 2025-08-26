@@ -14,7 +14,7 @@ def display_roles(roles):
         table.add_row(
             str(role.id),
             role.name,
-            role.description
+            role.description if role.description else "None"
         )
 
     console = Console()
@@ -55,7 +55,7 @@ def display_employees(employees, context):
             employee.last_name,
             employee.email,
             f"{str(employee.role_id)} ({employee.role.name})",
-            employee.created_at.strftime("%d/%m/%Y %H:%M")
+            employee.created_at.strftime("%Y-%m-%d %H:%M:%S")
         )
 
     table.caption = f"{len(employees)} résultat(s)"
@@ -106,11 +106,11 @@ def display_customers(customers, context):
             customer.first_name,
             customer.last_name,
             customer.email,
-            customer.phone,
-            customer.company,
+            customer.phone if customer.phone else "None",
+            customer.company if customer.company else "None",
             sale_contact_id,
-            customer.created_at.strftime("%d/%m/%Y %H:%M"),
-            customer.updated_at.strftime("%d/%m/%Y %H:%M")
+            customer.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            customer.updated_at.strftime("%Y-%m-%d %H:%M:%S")
         )
         
     table.caption = f"{len(customers)} résultat(s)"
@@ -163,7 +163,7 @@ def display_contracts(contracts, context):
             str(contract.total_amount),
             str(contract.remaining_amount),
             str(contract.signed),
-            contract.created_at.strftime("%d/%m/%Y %H:%M")
+            contract.created_at.strftime("%Y-%m-%d %H:%M:%S")
         )
 
     table.caption = f"{len(contracts)} résultat(s)"
@@ -199,11 +199,15 @@ def display_events(events, context):
     table.add_column("end_date", justify="left", style="yellow")
     table.add_column("location", justify="left", style="bright_green")
     table.add_column("attendees", justify="right", style="cyan1")
+    table.add_column("notes", justify="left", style="dark_orange")
     table.add_column("created_at", justify="left", style="")
 
     for event in events:
+        cust = event.contract.customer
+        event_contract_id = f"{str(event.contract_id)} ({cust.first_name} {cust.last_name})"
+
         sc = event.support_contact
-        
+
         if sc is not None:
             support_contact_id = f"{str(event.support_contact_id)} ({sc.first_name} {sc.last_name} - {sc.employee_number})"
         else:
@@ -212,13 +216,14 @@ def display_events(events, context):
         table.add_row(
             str(event.id),
             event.name,
-            str(event.contract_id),
+            event_contract_id,
             support_contact_id,
-            event.start_date.strftime("%d/%m/%Y %H:%M"),
-            event.end_date.strftime("%d/%m/%Y %H:%M"),
-            event.location,
-            str(event.attendees),
-            event.created_at.strftime("%d/%m/%Y %H:%M")
+            event.start_date.strftime("%Y-%m-%d %H:%M:%S") if event.start_date else "None",
+            event.end_date.strftime("%Y-%m-%d %H:%M:%S") if event.end_date else "None",
+            event.location if event.location else "None",
+            str(event.attendees) if event.attendees else "None",
+            event.notes if event.notes else "None",
+            event.created_at.strftime("%Y-%m-%d %H:%M:%S")
         )
 
     table.caption = f"{len(events)} résultat(s)"
