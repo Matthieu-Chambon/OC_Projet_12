@@ -97,6 +97,34 @@ def login():
         save_token_locally(token)
     else:
         print("Échec de la connexion : numéro d'employé ou mot de passe incorrect.")
+        
+@cli.command("change-password")
+def change_password():
+    """Changer le mot de passe de l'utilisateur connecté."""
+    print("Demande de changement du mot de passe pour l'utilisateur connecté.")
+    token = load_token()
+    employee_number = decode_access_token(token)["emp_number"]
+    employees = crud_employee.get_employees(db, {"employee_number": employee_number}, None)
+
+    try:
+        employee = employees[0]
+    except Exception as e:
+        print(f"Aucun employé trouvé avec le numéro {employee_number}.")
+        return
+    
+    previous_password = getpass(">>> Mot de passe précédent : ")
+    new_password = getpass(">>> Nouveau mot de passe : ")
+
+    if not verify_password(previous_password, employee.password):
+        print("Échec de la mise à jour du mot de passe : mot de passe précédent incorrect.")
+        return
+    
+    if safe_execute(crud_employee.update_password,db, employee, new_password):
+        print("Mot de passe mis à jour avec succès.")
+    else:
+        print("Erreur lors de la mise à jour du mot de passe.")
+
+        
 
 # ******************************************* #
 #                   Role                      #
@@ -133,7 +161,7 @@ def create_employee():
 
     while True:
         email = input_with_limit("Email : ", 100)
-        if not crud_employee.get_employees(db, {"email": email}):
+        if not crud_employee.get_employees(db, {"email": email}, None):
             break
         else:
             print(f"Un employé avec l'email {email} existe déjà. Veuillez en choisir un autre.")
@@ -213,6 +241,31 @@ def update_employee(employee, update):
     if employee:
         views.display_employees([employee], "update")
         
+@employee.command("update-password")
+@click.argument("employee")
+@require_token
+@is_manager
+def update_employee_password(employee):
+    """Met à jour le mot de passe d'un employé."""
+    
+    if employee.isdigit():
+        employees = safe_execute(crud_employee.get_employees, db, {"id": employee}, None)
+    else:
+        employees = safe_execute(crud_employee.get_employees, db, {"employee_number": employee}, None)
+
+    try:
+        employee = employees[0]
+    except Exception as e:
+        print(f"Aucun employé trouvé avec le numéro ou ID {employee}.")
+        return
+
+    new_password = getpass(">>> Nouveau mot de passe : ")
+
+    if safe_execute(crud_employee.update_password,db, employee, new_password):
+            print("Mot de passe mis à jour avec succès.")
+    else:
+        print("Erreur lors de la mise à jour du mot de passe.")
+
 @employee.command("delete")
 @click.argument("employee")
 @require_token
@@ -579,11 +632,16 @@ def create_event():
         
         if contract.event:
             print(f"Un événement est déjà associé au contrat {contract_id}.")
-            continue
+            continue 
 
-        if contract.sale_contact.employee_number != req_emp_num or employee.role.name != "Management":
-            print(f"Vous n'êtes pas le commercial associé à ce contrat.")
-            continue
+        if contract.sale_contact:
+            if contract.sale_contact.employee_number != req_emp_num and employee.role.name != "Management":
+                print(f"Vous n'êtes pas autorisé à créer un événement pour ce contrat.")
+                continue
+        else:
+            if employee.role.name != "Management":
+                print(f"Seul un manager peut créer un événement si le contrat n'a pas de commercial associé.")
+                continue
 
         if contract.signed is False:
             print(f"Le contrat {contract_id} n'est pas signé.")
@@ -592,25 +650,25 @@ def create_event():
         break
     
     while True:
-        start_date = input(">>> Date de début de l'événement (DD/MM/YYYY HH:MM) : ")
-        
+        start_date = input(">>> Date de début de l'événement (YYYY-MM-DD HH:MM) : ")
+
         try:
-            start_date = datetime.strptime(start_date, "%d/%m/%Y %H:%M")
+            start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
             print(start_date)
         except ValueError:
-            print("Format de date invalide. Veuillez utiliser le format DD/MM/YYYY HH:MM.")
+            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
         
         break
     
     while True:
-        end_date = input(">>> Date de fin de l'événement (DD/MM/YYYY HH:MM) : ")
-        
+        end_date = input(">>> Date de fin de l'événement (YYYY-MM-DD HH:MM) : ")
+
         try:
-            end_date = datetime.strptime(end_date, "%d/%m/%Y %H:%M")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
             print(end_date)
         except ValueError:
-            print("Format de date invalide. Veuillez utiliser le format DD/MM/YYYY HH:MM.")
+            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
         
         if end_date <= start_date:
@@ -636,7 +694,7 @@ def create_event():
 
         break
     
-    note = input_with_limit("Remarques supplémentaires : ", 255)
+    notes = input_with_limit("Remarques supplémentaires : ", 255)
     
     data = {
         "name": name,
@@ -645,7 +703,7 @@ def create_event():
         "end_date": end_date.strftime("%Y-%m-%d %H:%M:%S"),
         "location": location,
         "attendees": attendees,
-        "note": note
+        "notes": notes
     }
 
     event = safe_execute(crud_event.create_event, db, data)
@@ -692,6 +750,21 @@ def update_event(event_id, update):
     req_emp_num = decode_access_token(load_token())["emp_number"]
 
     event = safe_execute(crud_event.update_event, db, event_id, updates, req_emp_num)
+    if event:
+        views.display_events([event], "update")
+
+@event.command("update-contact")
+@click.argument("event_id", type=int)
+@click.argument("support_contact")
+@require_token
+@is_manager
+def update_event_support_contact(event_id, support_contact):
+    """
+    Met à jour le contact support d'un événement.
+
+    Exemple : event update-contact 1 EMP0001
+    """
+    event = safe_execute(crud_event.update_event_support_contact, db, event_id, support_contact)
     if event:
         views.display_events([event], "update")
 
