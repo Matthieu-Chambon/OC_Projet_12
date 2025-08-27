@@ -4,6 +4,7 @@ from app.auth.token import decode_access_token
 from rich.console import Console
 from rich.text import Text
 
+
 def require_token(func):
     def wrapper(*args, **kwargs):
         token = load_token()
@@ -18,11 +19,7 @@ def require_token(func):
             console.print(Text(f"Token invalide ou expiré : {str(e)}", style="red"))
             return
         
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            console.print(Text(f"Erreur lors de l'exécution de la fonction : {str(e)}", style="red"))
-            return
+        return func(*args, **kwargs)            
     return wrapper
 
 def is_salesperson_or_manager(func):
