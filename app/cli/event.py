@@ -5,7 +5,7 @@ from app.auth.decorators import require_token, is_salesperson_or_manager, is_sup
 from app.db.database import Session
 from app.crud import employee as crud_employee
 from app.crud import contract as crud_contract
-from app.crud import customer as crud_event
+from app.crud import event as crud_event
 from app.ui import views
 
 import click
@@ -23,6 +23,7 @@ def event():
 @require_token
 @is_salesperson_or_manager
 def create_event():
+    """Créer un nouvel événement."""
     req_emp_num = decode_access_token(load_token())["emp_number"]
     employee = safe_execute(crud_employee.get_employees, db, {"employee_number": req_emp_num}, None)[0]
 
@@ -182,11 +183,7 @@ def update_event_support_contact(event_id, support_contact):
 @require_token
 @is_manager
 def delete_event(event_id):
-    """
-    Supprime un événement.
-
-    Exemple : event delete 1
-    """
+    """Supprime un événement."""
     events = safe_execute(crud_event.get_events, db, {"id": event_id}, None)
 
     try:

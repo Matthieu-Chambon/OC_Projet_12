@@ -44,6 +44,8 @@ def safe_execute(func, *args, **kwargs):
     """Exécute une fonction en toute sécurité et capture les exceptions."""
     try:
         return func(*args, **kwargs)
+    except ValueError as e:
+        print(e)
     except Exception as e:
         print(f"[ERREUR] : {e}")
         prepare_sentry_scope({

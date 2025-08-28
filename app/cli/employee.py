@@ -13,7 +13,7 @@ db = Session()
 
 @cli.group()
 def employee():
-    """Groupe de commandes pour la gestion des employés"""
+    """Groupe de commandes pour gérer les employés"""
     pass
 
 @employee.command("create")
@@ -72,7 +72,7 @@ def create_employee():
 @click.option(
     "--sort", "-s",
     multiple=True,
-    help="Critère de tri au format attribut=asc|desc.\nExemple: -s last_name=asc"
+    help="Critère de tri au format attribut=asc|desc. Exemple: -s last_name=asc"
 )
 @require_token
 def get_employees(filter, sort):

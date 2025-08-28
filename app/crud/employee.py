@@ -3,6 +3,7 @@ from app.auth.password import hash_password
 from uuid import uuid4
 
 def create_employee(session, data):
+    """Crée un nouvel employé."""
     try:
         temp_number = "TEMP-" + uuid4().hex
         print(f"Création d'un nouvel employé avec le numéro temporaire : {temp_number}")
@@ -22,6 +23,7 @@ def create_employee(session, data):
         raise ValueError(f"Erreur lors de la création de l'employé : {e}")
 
 def get_employees(session, filters, sorts):
+    """Récupère la liste des employés en fonction des critères du filtrage et du tri."""
     query = session.query(Employee)
 
     for attr, value in filters.items():
@@ -55,6 +57,7 @@ def get_employees(session, filters, sorts):
     return query.all()
 
 def update_employee(session, employee_number_or_id, updates):
+    """Met à jour un employé."""
     employee = session.query(Employee).filter(
         (Employee.employee_number == employee_number_or_id) | (Employee.id == employee_number_or_id)
     ).first()
@@ -82,10 +85,12 @@ def update_employee(session, employee_number_or_id, updates):
     return employee
 
 def update_password(session, employee, new_password):
+    """Met à jour le mot de passe d'un employé."""
     employee.password = hash_password(new_password)
     session.commit()
     return True
     
 def delete_employee(session, employee):
+    """Supprime un employé."""
     session.delete(employee)
     session.commit()

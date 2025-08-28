@@ -22,6 +22,7 @@ def contract():
 @require_token
 @is_manager
 def create_contract():
+    """Créer un nouveau contrat."""
     while True:
         customer_id = input(">>> ID du client : ")
         customers = crud_customer.get_customers(db, {"id": customer_id}, None)
@@ -117,7 +118,7 @@ def create_contract():
 @click.option(
     "--sort", "-s",
     multiple=True,
-    help="Critère de tri au format attribut=asc|desc.\nExemple: -s last_name=asc"
+    help="Critère de tri au format attribut=asc|desc. Exemple: -s last_name=asc"
 )
 @require_token
 def get_contracts(filter, sort):
@@ -156,11 +157,7 @@ def update_contract(contract_id, update):
 @require_token
 @is_manager
 def delete_contract(contract_id):
-    """
-    Supprime un contrat.
-
-    Exemple : contract delete 1
-    """
+    """Supprime un contrat."""
     contracts = safe_execute(crud_contract.get_contracts, db, {"id": contract_id}, None)  
     
     try:

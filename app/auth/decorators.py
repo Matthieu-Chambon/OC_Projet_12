@@ -4,8 +4,12 @@ from app.auth.token import decode_access_token
 from rich.console import Console
 from rich.text import Text
 
+import functools
+
 
 def require_token(func):
+    """Vérifie la présence d'un token d'authentification."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         token = load_token()
         console = Console()
@@ -23,6 +27,8 @@ def require_token(func):
     return wrapper
 
 def is_salesperson_or_manager(func):
+    """Vérifie si l'utilisateur est un commercial ou un manager."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
@@ -39,6 +45,8 @@ def is_salesperson_or_manager(func):
     return wrapper
 
 def is_support_or_manager(func):
+    """Vérifie si l'utilisateur est un support ou un manager."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)
@@ -55,6 +63,8 @@ def is_support_or_manager(func):
     return wrapper
 
 def is_manager(func):
+    """Vérifie si l'utilisateur est un manager."""
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         token = load_token()
         payload = decode_access_token(token)

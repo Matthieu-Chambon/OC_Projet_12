@@ -3,6 +3,7 @@ from rich.table import Table
 from rich.text import Text
 
 def display_roles(roles):
+    """Affiche la liste des rôles."""
     table = Table(title="\n:lock: Liste des rôles :")
     table.title_style = "bold"
 
@@ -22,6 +23,7 @@ def display_roles(roles):
     console.print("\n")
 
 def display_employees(employees, context):
+    """Affiche la liste des employés."""
     console = Console()
     
     if not employees:
@@ -66,6 +68,7 @@ def display_employees(employees, context):
     console.print("\n")
 
 def display_customers(customers, context):
+    """Affiche la liste des clients."""
     console = Console()
 
     if not customers:
@@ -121,6 +124,7 @@ def display_customers(customers, context):
     console.print("\n")
     
 def display_contracts(contracts, context):
+    """Affiche la liste des contrats."""
     console = Console()
 
     if not contracts:
@@ -174,6 +178,7 @@ def display_contracts(contracts, context):
     console.print("\n")
 
 def display_events(events, context):
+    """Affiche la liste des événements."""
     console = Console()
 
     if not events:

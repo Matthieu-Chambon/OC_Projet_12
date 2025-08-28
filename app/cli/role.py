@@ -9,7 +9,7 @@ db = Session()
 
 @cli.group()
 def role():
-    """Gestion des rôles"""
+    """Groupe de commandes pour gérer les rôles"""
     pass
 
 @role.command("list")

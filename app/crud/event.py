@@ -2,6 +2,7 @@ from app.models.models import Event, Employee
 from datetime import datetime
 
 def create_event(session, data):
+    """Crée un nouvel événement."""
     try:
         event = Event(**data)
         session.add(event)
@@ -12,6 +13,7 @@ def create_event(session, data):
         raise ValueError(f"Erreur lors de la création de l'événement : {e}")
     
 def get_events(session, filters, sorts):
+    """Récupère la liste des événements en fonction des critères du filtrage et du tri."""
     query = session.query(Event)
     
     for attr, value in filters.items():
@@ -45,6 +47,7 @@ def get_events(session, filters, sorts):
     return query.all()
 
 def update_event(session, event_id, updates, req_emp_num):
+    """Met à jour un événement."""
     event = session.query(Event).filter(Event.id == event_id).first()
 
     if not event:
@@ -82,6 +85,7 @@ def update_event(session, event_id, updates, req_emp_num):
     return event
 
 def update_event_support_contact(session, event_id, support_contact):
+    """Met à jour le contact support d'un événement."""
     employee = session.query(Employee).filter(
         (Employee.id == support_contact) | (Employee.employee_number == support_contact)
     ).first()
@@ -104,5 +108,6 @@ def update_event_support_contact(session, event_id, support_contact):
     return event
 
 def delete_event(session, event):
+    """Supprime un événement."""
     session.delete(event)
     session.commit()

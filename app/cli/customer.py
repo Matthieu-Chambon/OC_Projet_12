@@ -14,7 +14,7 @@ db = Session()
 
 @cli.group()
 def customer():
-    """Groupe de commandes pour la gestion des clients."""
+    """Groupe de commandes pour gérer les clients."""
     pass
 
 @customer.command("create")
@@ -115,11 +115,7 @@ def update_customer_sale_contact(customer_id, sale_contact):
 @require_token
 @is_manager
 def delete_customer(customer_id):
-    """
-    Supprime un client.
-
-    Exemple : customer delete 1
-    """
+    """Supprime un client."""
     customers = safe_execute(crud_customer.get_customers, db, {"id": customer_id}, None)
     
     try:

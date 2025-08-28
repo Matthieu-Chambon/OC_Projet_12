@@ -1,6 +1,7 @@
 from app.models.models import Customer, Employee
 
 def create_customer(session, data):
+    """Crée un nouveau client."""
     try:
         new_customer = Customer(**data)
         session.add(new_customer)
@@ -11,6 +12,7 @@ def create_customer(session, data):
         raise ValueError(f"Erreur lors de la création du client : {e}")
     
 def get_customers(session, filters, sorts):
+    """Récupère la liste des clients en fonction des critères du filtrage et du tri."""
     query = session.query(Customer)
 
     for attr, value in filters.items():
@@ -44,6 +46,7 @@ def get_customers(session, filters, sorts):
     return query.all()
 
 def update_customer(session, customer_id, updates, req_emp_num):
+    """Met à jour un client."""
     customer = session.query(Customer).filter(Customer.id == customer_id).first()
 
     if not customer:
@@ -75,6 +78,7 @@ def update_customer(session, customer_id, updates, req_emp_num):
     return customer
 
 def update_customer_sale_contact(session, customer_id, sale_contact):
+    """Met à jour le contact commercial d'un client."""
     employee = session.query(Employee).filter(
         (Employee.id == sale_contact) | (Employee.employee_number == sale_contact)
     ).first()
@@ -101,5 +105,6 @@ def update_customer_sale_contact(session, customer_id, sale_contact):
     return customer
 
 def delete_customer(session, customer):
+    """Supprime un client."""
     session.delete(customer)
     session.commit()

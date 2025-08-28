@@ -1,6 +1,7 @@
-from app.models.models import Contract, Customer, Employee
+from app.models.models import Contract, Employee
 
 def create_contract(session, data):
+    """Crée un nouveau contrat."""
     try:
         new_contract = Contract(**data)
         session.add(new_contract)
@@ -11,6 +12,7 @@ def create_contract(session, data):
         raise ValueError(f"Erreur lors de la création du contrat : {e}")
     
 def get_contracts(session, filters, sorts):
+    """Récupère la liste des contrats en fonction des critères du filtrage et du tri."""
     query = session.query(Contract)
     
     for attr, value in filters.items():
@@ -44,6 +46,7 @@ def get_contracts(session, filters, sorts):
     return query.all()
 
 def update_contract(session, contract_id, updates, req_emp_num):
+    """Met à jour un contrat."""
     contract = session.query(Contract).filter(Contract.id == contract_id).first()
 
     if not contract:
@@ -88,6 +91,8 @@ def update_contract(session, contract_id, updates, req_emp_num):
                 if value.lower() in ["oui", "o", "yes", "y", "1", "true"]:
                     value = True
                 elif value.lower() in ["non", "n", "no", "0", "false"]:
+                    if contract.event:
+                        raise ValueError("Le contrat est lié à un événement et ne peut pas être marqué comme non signé.")
                     value = False
                 else:
                     raise ValueError(f"La valeur de l'attribut 'signed' doit être 'True' ou 'False'.")
@@ -102,5 +107,6 @@ def update_contract(session, contract_id, updates, req_emp_num):
     return contract
 
 def delete_contract(session, contract):
+    """Supprime un contrat."""
     session.delete(contract)
     session.commit()
