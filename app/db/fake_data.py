@@ -1,15 +1,22 @@
-from app.db.database import engine
 from app.models.models import Base, Employee, Customer, Contract, Event
-from app.db.database import Session
-from sqlalchemy_utils import database_exists, create_database
+from app.db.database import Session, engine
 from app.auth.password import hash_password
 
 
-# Windows powershell
-# $env:PYTHONPATH = "."
-# python .\app\db\fake_data.py
+# python -m app.db.fake_data
 
 db = Session()
+
+# Supprimer toutes les tables sauf Role
+for table in reversed(Base.metadata.sorted_tables):  # reversed pour gérer les FK
+    if table.name != "role":
+        print(f"Suppression de la table {table.name}...")
+        table.drop(bind=engine, checkfirst=True)
+        
+print("Création de toutes les tables...")
+Base.metadata.create_all(bind=engine)
+        
+db.commit()
 
 employees = [
     Employee(
@@ -105,6 +112,13 @@ contracts = [
         signed=True
     ),
     Contract(
+        customer_id=2, # Eva Moreau
+        sale_contact_id=1, # Alice Dupont
+        total_amount=2500.00,
+        remaining_amount=2500.00,
+        signed=True
+    ),
+    Contract(
         customer_id=3, # Frank Bernard
         sale_contact_id=2, # Marie Curie
         total_amount=3000.00,
@@ -139,10 +153,20 @@ events = [
         location="Salle de conférence",
         attendees=10,
         notes="Discussion des objectifs du trimestre"
+    ),
+    Event( # Pas de support_contact_id
+        name="Atelier de formation",
+        contract_id=3,
+        start_date="2025-08-23 14:00:00",
+        end_date="2025-08-23 16:00:00",
+        location="Salle de formation",
+        attendees=20,
+        notes="Formation sur les nouvelles fonctionnalités"
     )
 ]
 
 
+# Insère les données
 db.add_all(employees)
 db.add_all(customers)
 db.add_all(contracts)
