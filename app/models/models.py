@@ -55,7 +55,7 @@ class Customer(Base):
     contracts : Mapped[list["Contract"]] = relationship("Contract", back_populates="customer", passive_deletes=True)
 
     def __repr__(self):
-        return f"<Customer(id={self.id}, first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}', phone='{self.phone}', company='{self.company}', sale_contact_id='{self.sale_contact_id}')>"
+        return f"<Customer(id={self.id}, first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}', phone='{self.phone}', company='{self.company}', sale_contact_id={self.sale_contact_id})>"
 
 
 class Contract(Base):
