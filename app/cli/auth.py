@@ -48,13 +48,20 @@ def change_password():
         return
     
     previous_password = getpass(">>> Mot de passe précédent : ")
-    new_password = getpass(">>> Nouveau mot de passe : ")
-
+    
     if not verify_password(previous_password, employee.password):
         print("Échec de la mise à jour du mot de passe : mot de passe précédent incorrect.")
         return
     
-    if safe_execute(crud_employee.update_password,db, employee, new_password):
+    while True:
+        new_password = getpass(">>> Nouveau mot de passe : ")
+        confirm_password = getpass(">>> Confirmer le nouveau mot de passe : ")
+        if new_password == confirm_password:
+            break
+        else:
+            print("Les mots de passe ne correspondent pas. Veuillez réessayer.")
+
+    if safe_execute(crud_employee.update_password, db, employee, new_password):
         print("Mot de passe mis à jour avec succès.")
     else:
         print("Erreur lors de la mise à jour du mot de passe.")

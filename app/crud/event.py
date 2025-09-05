@@ -12,7 +12,7 @@ def create_event(session, data):
     except Exception as e:
         raise ValueError(f"Erreur lors de la création de l'événement : {e}")
     
-def get_events(session, filters, sorts):
+def get_events(session, filters={}, sorts={}):
     """Récupère la liste des événements en fonction des critères du filtrage et du tri."""
     query = session.query(Event)
     
@@ -74,9 +74,20 @@ def update_event(session, event_id, updates, req_emp_num):
         
         if value.lower() in ("none", "null"):
             value = None
-        
-        elif value.lower() in ("true", "false"):
-            value = value.lower() == "true"
+                   
+        if attribute in ['start_date', 'end_date'] and value is not None:
+            try:
+                value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                raise ValueError(f"Le format de la date pour '{attribute}' est invalide. Utilisez le format YYYY-MM-DD HH:MM:SS.")
+
+        if attribute == 'attendees' and value is not None:
+            try:
+                value = int(value)
+                if value < 0:
+                    raise ValueError(f"Le nombre d'invités doit être un entier positif.")
+            except ValueError:
+                raise ValueError(f"Le nombre d'invités doit être un entier positif.")        
 
         setattr(event, attribute, value)
 

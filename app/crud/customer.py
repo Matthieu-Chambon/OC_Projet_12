@@ -11,7 +11,7 @@ def create_customer(session, data):
     except Exception as e:
         raise ValueError(f"Erreur lors de la création du client : {e}")
     
-def get_customers(session, filters, sorts):
+def get_customers(session, filters={}, sorts={}):
     """Récupère la liste des clients en fonction des critères du filtrage et du tri."""
     query = session.query(Customer)
 

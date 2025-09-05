@@ -9,7 +9,7 @@ from app.crud import event as crud_event
 from app.ui import views
 
 import click
-import datetime
+from datetime import datetime
 
 
 db = Session()

@@ -11,7 +11,7 @@ def create_contract(session, data):
     except Exception as e:
         raise ValueError(f"Erreur lors de la création du contrat : {e}")
     
-def get_contracts(session, filters, sorts):
+def get_contracts(session, filters={}, sorts={}):
     """Récupère la liste des contrats en fonction des critères du filtrage et du tri."""
     query = session.query(Contract)
     

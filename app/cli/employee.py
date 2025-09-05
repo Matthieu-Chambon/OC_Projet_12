@@ -124,7 +124,13 @@ def update_employee_password(employee):
         print(f"Aucun employé trouvé avec le numéro ou ID {employee}.")
         return
 
-    new_password = getpass(">>> Nouveau mot de passe : ")
+    while True:
+        new_password = getpass(">>> Nouveau mot de passe : ")
+        confirm_password = getpass(">>> Confirmer le nouveau mot de passe : ")
+        if new_password == confirm_password:
+            break
+        else:
+            print("Les mots de passe ne correspondent pas. Veuillez réessayer.")
 
     if safe_execute(crud_employee.update_password,db, employee, new_password):
             print("Mot de passe mis à jour avec succès.")

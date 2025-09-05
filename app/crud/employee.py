@@ -22,7 +22,7 @@ def create_employee(session, data):
     except Exception as e:
         raise ValueError(f"Erreur lors de la création de l'employé : {e}")
 
-def get_employees(session, filters, sorts):
+def get_employees(session, filters={}, sorts={}):
     """Récupère la liste des employés en fonction des critères du filtrage et du tri."""
     query = session.query(Employee)
 
