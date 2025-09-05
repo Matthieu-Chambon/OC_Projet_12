@@ -1,13 +1,13 @@
 
 import os
 import pytest
+import pymysql
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.auth.password import hash_password
 from app.models.models import Base, Role, Employee, Customer, Contract, Event
-import os
 from dotenv import load_dotenv
-import pymysql
+
 
 load_dotenv()
 
