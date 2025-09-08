@@ -10,6 +10,7 @@ def test_command_role_list(runner):
     assert "Liste des rôles" in result.output
     assert all(role in result.output for role in ["Commercial", "Support", "Management"])
 
+
 def test_command_role_list_unauthenticated(runner):
     """Test de la commande role list sans authentification."""
     result = runner.invoke(role, ["list"])

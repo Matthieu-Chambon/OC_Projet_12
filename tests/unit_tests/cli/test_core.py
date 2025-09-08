@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from app.cli import core
 import click
 
+
 def test_prepare_sentry_scope_without_user_without_extra_context(mocker):
     """Test sans utilisateur et sans contexte supplémentaire."""
     # Mock de la fonction get_employees pour ne pas renvoyer d'utilisateur
@@ -24,6 +25,7 @@ def test_prepare_sentry_scope_without_user_without_extra_context(mocker):
     # Vérification que .set_extra n'a pas été appelé
     mock_scope.set_extra.assert_not_called()
 
+
 def test_prepare_sentry_scope_with_user_and_extra_context(mocker):
     """Test avec utilisateur et contexte supplémentaire."""
     # Création d'un faux utilisateur
@@ -39,7 +41,7 @@ def test_prepare_sentry_scope_with_user_and_extra_context(mocker):
     mocker.patch.object(core, "load_token", return_value="fake_token")
     mocker.patch.object(core, "decode_access_token", return_value={"emp_number": "EMP0001"})
     mocker.patch.object(core.crud_employee, "get_employees", return_value=[fake_user])
-    
+
     # mocker "with sentry_sdk.configure_scope() as scope" (contexte manager)
     mock_scope_ctx = mocker.patch("app.cli.core.sentry_sdk.configure_scope")
     # création faux objet scope (qui est censé avoir .set_user et .set_extra)
@@ -62,6 +64,7 @@ def test_prepare_sentry_scope_with_user_and_extra_context(mocker):
     # Vérification de l'appel à la méthode .set_extra
     mock_scope.set_extra.assert_called_once_with("function", "my_function")
 
+
 def test_safe_execute_success():
     """Fonction qui se déroule normalement."""
     def my_func(a, b):
@@ -69,6 +72,7 @@ def test_safe_execute_success():
 
     result = core.safe_execute(my_func, 2, 3)
     assert result == 5
+
 
 def test_safe_execute_value_error(mocker):
     """Fonction qui lève ValueError."""
@@ -80,6 +84,7 @@ def test_safe_execute_value_error(mocker):
 
     mock_print.assert_called_once_with("Cette fonction échoue")
     assert result is None
+
 
 def test_safe_execute_generic_exception(mocker):
     """Fonction qui lève une exception générique."""
@@ -110,14 +115,16 @@ def test_safe_execute_generic_exception(mocker):
 
     # Vérifie que sentry_sdk.capture_exception a été appelé
     mock_capture.assert_called_once()
-    
+
+
 def test_input_with_limit_ok(mocker):
     """Test de la fonction input_with_limit avec une entrée valide."""
     mocker.patch("builtins.input", return_value="Hello")
-    
+
     result = core.input_with_limit("Entrez un texte:", 10)
-    
+
     assert result == "Hello"
+
 
 def test_input_with_limit_too_long(mocker):
     """Test de la fonction input_with_limit avec une entrée trop longue."""
@@ -128,15 +135,16 @@ def test_input_with_limit_too_long(mocker):
 
     # Appel de la fonction à tester
     result = core.input_with_limit("Entrez un texte:", 5)
-    
+
     # Vérifie que la fonction retourne la valeur correcte
     assert result == "Ok"
-    
+
     # Vérifie que le message d'erreur a été affiché
     mock_print.assert_called_with("Veuillez entrer un texte de moins de 5 caractères.")
-    
+
     # Vérifie que input a été appelé deux fois
     assert mock_input.call_count == 2
+
 
 def test_attr_val_to_dict_success(mocker):
     """Test de la fonction attr_val_to_dict avec des données valides."""
@@ -154,6 +162,7 @@ def test_attr_val_to_dict_success(mocker):
         "attr3": "value3"
     }
 
+
 def test_attr_val_to_dict_fail(mocker):
     """Test de la fonction attr_val_to_dict avec une entrée invalide."""
     attr_val_pairs = [
@@ -164,6 +173,7 @@ def test_attr_val_to_dict_fail(mocker):
 
     with pytest.raises(click.BadParameter):
         core.attr_val_to_dict(attr_val_pairs)
+
 
 def test_sort_to_dict_success(mocker):
     """Test de la fonction sort_to_dict avec des données valides."""
@@ -181,6 +191,7 @@ def test_sort_to_dict_success(mocker):
         "attr3": "asc"
     }
 
+
 def test_sort_to_dict_without_equals(mocker):
     """Test de la fonction sort_to_dict sans '=' dans ses critères."""
     sort = [
@@ -191,6 +202,7 @@ def test_sort_to_dict_without_equals(mocker):
 
     with pytest.raises(click.BadParameter):
         core.sort_to_dict(sort)
+
 
 def test_sort_to_dict_wrong_sort_keyword(mocker):
     """Test de la fonction sort_to_dict avec un mot-clé de tri invalide."""

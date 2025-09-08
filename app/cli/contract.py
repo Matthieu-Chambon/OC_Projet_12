@@ -18,6 +18,7 @@ def contract():
     """Groupe de commandes pour gérer les contrats."""
     pass
 
+
 @contract.command("create")
 @require_token
 @is_manager
@@ -34,12 +35,12 @@ def create_contract():
         customer = customers[0]
         print(customer.id)
         break
-    
+
     sale_contact_id = customer.sale_contact_id
-    
+
     while True:
         total_amount = input(">>> Montant total du contrat (en €): ")
-        
+
         try:
             total_amount = float(total_amount)
         except ValueError:
@@ -49,20 +50,20 @@ def create_contract():
         if total_amount <= 0:
             print("Le montant total doit être supérieur à 0.")
             continue
-        
+
         if total_amount > 99999999.99:
             print("Le montant total ne peut pas dépasser 99 999 999,99€.")
             continue
-        
+
         print(total_amount)
         break
-    
+
     while True:
         remaining_amount = input(f">>> Montant restant du contrat (défaut {total_amount}€): ")
         if not remaining_amount:
             remaining_amount = total_amount
             break
-        
+
         try:
             remaining_amount = float(remaining_amount)
         except ValueError:
@@ -72,14 +73,14 @@ def create_contract():
         if remaining_amount <= 0:
             print("Le montant restant doit être supérieur à 0.")
             continue
-        
+
         if remaining_amount > total_amount:
             print("Le montant restant ne peut pas être supérieur au montant total.")
             continue
 
         print(remaining_amount)
         break
-    
+
     while True:
         signed = input(">>> Contrat signé (oui/non, défaut non) : ").strip().lower()
 
@@ -96,7 +97,7 @@ def create_contract():
             continue
 
         break
-    
+
     data = {
         "customer_id": customer.id,
         "sale_contact_id": sale_contact_id,
@@ -108,7 +109,8 @@ def create_contract():
     contract = safe_execute(crud_contract.create_contract, db, data)
     if contract:
         views.display_contracts([contract], "create")
-        
+
+
 @contract.command("list")
 @click.option(
     "--filter", "-f",
@@ -126,13 +128,14 @@ def get_contracts(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-    
+
     print(f"Filtres appliqués : {filters}")
     print(f"Tris appliqués : {sorts}")
 
     contracts = safe_execute(crud_contract.get_contracts, db, filters, sorts)
     views.display_contracts(contracts, "list")
-    
+
+
 @contract.command("update")
 @click.argument("contract_id", type=int)
 @click.argument("update", nargs=-1, required=True)
@@ -151,23 +154,25 @@ def update_contract(contract_id, update):
     contract = safe_execute(crud_contract.update_contract, db, contract_id, updates, req_emp_num)
     if contract:
         views.display_contracts([contract], "update")
-        
+
+
 @contract.command("delete")
 @click.argument("contract_id")
 @require_token
 @is_manager
 def delete_contract(contract_id):
     """Supprime un contrat."""
-    contracts = safe_execute(crud_contract.get_contracts, db, {"id": contract_id}, None)  
-    
+    contracts = safe_execute(crud_contract.get_contracts, db, {"id": contract_id}, None)
+
     try:
         contract = contracts[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun contrat trouvé avec l'ID {contract_id}.")
         return
 
     while True:
-        confirmation = input(f">>> Êtes-vous sûr de vouloir supprimer le contrat {contract.id} (client : {contract.customer.first_name} {contract.customer.last_name}) ? (oui/non) ")
+        confirmation = input(f">>> Êtes-vous sûr de vouloir supprimer le contrat {contract.id} "
+                             f"(client : {contract.customer.first_name} {contract.customer.last_name}) ? (oui/non) ")
         if confirmation.lower() == "oui":
             views.display_contracts([contract], "delete")
             safe_execute(crud_contract.delete_contract, db, contract)

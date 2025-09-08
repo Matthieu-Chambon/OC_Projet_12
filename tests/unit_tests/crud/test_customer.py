@@ -2,6 +2,7 @@ import pytest
 from app.crud import customer as crud_customer
 from app.models.models import Customer
 
+
 def test_create_customer(session):
     """Vérifie que la création d'un client fonctionne."""
     data = {
@@ -17,7 +18,7 @@ def test_create_customer(session):
         session,
         data
     )
-    
+
     assert new_customer.id is not None
     assert new_customer.first_name == data["first_name"]
     assert new_customer.last_name == data["last_name"]
@@ -25,6 +26,7 @@ def test_create_customer(session):
     assert new_customer.phone == data["phone"]
     assert new_customer.company == data["company"]
     assert new_customer.sale_contact_id == data["sale_contact_id"]
+
 
 def test_create_customer_fail(session):
     """Vérifie que la création d'un client échoue avec des données invalides."""
@@ -43,12 +45,14 @@ def test_create_customer_fail(session):
             data
         )
 
+
 def test_get_customers(session):
     """Vérifie que la récupération d'un client fonctionne."""
     customers = crud_customer.get_customers(session)
     assert customers is not None
     assert len(customers) == 3
-    
+
+
 def test_get_customers_with_filters(session):
     """Vérifie que la récupération des clients avec des filtres fonctionne."""
     filters = {
@@ -60,7 +64,8 @@ def test_get_customers_with_filters(session):
     assert len(customers) == 1
     assert customers[0].first_name == "Eva"
     assert customers[0].last_name == "Moreau"
-    
+
+
 def test_get_customers_with_sorts(session):
     """Vérifie que la récupération des clients avec des tris fonctionne."""
     sorts = {
@@ -70,6 +75,7 @@ def test_get_customers_with_sorts(session):
     assert customers is not None
     assert len(customers) == 3
     assert [customer.last_name for customer in customers] == ["Bernard", "Lefebvre", "Moreau"]
+
 
 def test_get_customers_with_filters_and_sorts(session):
     """Vérifie que la récupération des clients avec des filtres et des tris fonctionne."""
@@ -84,6 +90,7 @@ def test_get_customers_with_filters_and_sorts(session):
     assert len(customers) == 2
     assert [customer.last_name for customer in customers] == ["Moreau", "Lefebvre"]
 
+
 def test_update_customer(session):
     """Vérifie que la mise à jour d'un client fonctionne."""
     updates = {
@@ -95,17 +102,18 @@ def test_update_customer(session):
         session,
         1,
         updates,
-        "EMP0001" # Alice Dupont, contact de vente du client
+        "EMP0001"  # Alice Dupont, contact de vente du client
     )
 
     assert updated_customer is not None
     assert updated_customer.phone == updates["phone"]
     assert updated_customer.company == updates["company"]
 
+
 def test_update_customer_fail(session):
     """Vérifie que la mise à jour d'un client échoue avec des données invalides."""
     updates = {
-        "id": "80" # Impossible de modifier l'ID d'un client
+        "id": "80"  # Impossible de modifier l'ID d'un client
     }
 
     with pytest.raises(ValueError):
@@ -113,9 +121,10 @@ def test_update_customer_fail(session):
             session,
             1,
             updates,
-            "EMP0005" # Un manager ayant les droits
+            "EMP0005"  # Un manager ayant les droits
         )
-        
+
+
 def test_update_customer_unauthorized(session):
     """Vérifie que la mise à jour d'un client échoue si l'utilisateur n'est pas autorisé."""
     updates = {
@@ -128,8 +137,9 @@ def test_update_customer_unauthorized(session):
             session,
             1,
             updates,
-            "EMP0003" # Un employé (Support) sans droits
+            "EMP0003"  # Un employé (Support) sans droits
         )
+
 
 def test_delete_customer(session):
     """Vérifie que la suppression d'un client fonctionne."""
@@ -140,6 +150,6 @@ def test_delete_customer(session):
         session,
         customer,
     )
-    
+
     deleted_customer = session.query(Customer).filter(Customer.id == 1).first()
     assert deleted_customer is None

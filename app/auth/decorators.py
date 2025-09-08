@@ -22,9 +22,10 @@ def require_token(func):
         except Exception as e:
             console.print(Text(f"Token invalide ou expiré : {str(e)}", style="red"))
             return
-        
-        return func(*args, **kwargs)            
+
+        return func(*args, **kwargs)
     return wrapper
+
 
 def is_salesperson_or_manager(func):
     """Vérifie si l'utilisateur est un commercial ou un manager."""
@@ -44,6 +45,7 @@ def is_salesperson_or_manager(func):
             return
     return wrapper
 
+
 def is_support_or_manager(func):
     """Vérifie si l'utilisateur est un support ou un manager."""
     @functools.wraps(func)
@@ -61,6 +63,7 @@ def is_support_or_manager(func):
             console.print(Text("Accès refusé : cette action est réservée au département support.", style="red"))
             return
     return wrapper
+
 
 def is_manager(func):
     """Vérifie si l'utilisateur est un manager."""

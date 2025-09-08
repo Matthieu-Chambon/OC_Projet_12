@@ -9,12 +9,15 @@ from app.ui import views
 from getpass import getpass
 import click
 
+
 db = Session()
+
 
 @cli.group()
 def employee():
     """Groupe de commandes pour gérer les employés"""
     pass
+
 
 @employee.command("create")
 @require_token
@@ -38,10 +41,10 @@ def create_employee():
             break
         else:
             print("Les mots de passe ne correspondent pas. Veuillez réessayer.")
-    
+
     roles = safe_execute(crud_role.get_roles, db)
     views.display_roles(roles)
-    
+
     while True:
         role = input(">>> ID du rôle (1, 2 ou 3) : ")
         try:
@@ -62,7 +65,8 @@ def create_employee():
     new_employee = safe_execute(crud_employee.create_employee, db, data)
     if new_employee:
         views.display_employees([new_employee], "create")
-        
+
+
 @employee.command("list")
 @click.option(
     "--filter", "-f",
@@ -80,12 +84,13 @@ def get_employees(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-    
+
     print(f"Filtres appliqués : {filters}")
     print(f"Tris appliqués : {sorts}")
-    
+
     employees = safe_execute(crud_employee.get_employees, db, filters, sorts)
     views.display_employees(employees, "list")
+
 
 @employee.command("update")
 @click.argument("employee")
@@ -99,20 +104,21 @@ def update_employee(employee, update):
     Exemple : employee update EMP0001 first_name=Alice last_name="Dupont Martin"
     """
     updates = attr_val_to_dict(update)
-        
+
     print(updates)
 
     employee = safe_execute(crud_employee.update_employee, db, employee, updates)
     if employee:
         views.display_employees([employee], "update")
-        
+
+
 @employee.command("update-password")
 @click.argument("employee")
 @require_token
 @is_manager
 def update_employee_password(employee):
     """Met à jour le mot de passe d'un employé."""
-    
+
     if employee.isdigit():
         employees = safe_execute(crud_employee.get_employees, db, {"id": employee}, None)
     else:
@@ -120,7 +126,7 @@ def update_employee_password(employee):
 
     try:
         employee = employees[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun employé trouvé avec le numéro ou ID {employee}.")
         return
 
@@ -132,10 +138,11 @@ def update_employee_password(employee):
         else:
             print("Les mots de passe ne correspondent pas. Veuillez réessayer.")
 
-    if safe_execute(crud_employee.update_password,db, employee, new_password):
-            print("Mot de passe mis à jour avec succès.")
+    if safe_execute(crud_employee.update_password, db, employee, new_password):
+        print("Mot de passe mis à jour avec succès.")
     else:
         print("Erreur lors de la mise à jour du mot de passe.")
+
 
 @employee.command("delete")
 @click.argument("employee")
@@ -143,20 +150,24 @@ def update_employee_password(employee):
 @is_manager
 def delete_employee(employee):
     """Supprime un employé."""
-    
+
     if employee.isdigit():
         employees = safe_execute(crud_employee.get_employees, db, {"id": employee}, None)
     else:
         employees = safe_execute(crud_employee.get_employees, db, {"employee_number": employee}, None)
-   
+
     try:
         employee = employees[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun employé trouvé avec le numéro ou ID {employee}.")
         return
 
     while True:
-        confirmation = input(f">>> Êtes-vous sûr de vouloir supprimer l'employé {employee.first_name} {employee.last_name} ({employee.employee_number}) ? (oui/non) ")
+        confirmation = input(
+            f">>> Êtes-vous sûr de vouloir supprimer l'employé "
+            f"{employee.first_name} {employee.last_name} "
+            f"({employee.employee_number}) ? (oui/non) "
+        )
         if confirmation.lower() == "oui":
             views.display_employees([employee], "delete")
             safe_execute(crud_employee.delete_employee, db, employee)

@@ -12,10 +12,12 @@ import click
 
 db = Session()
 
+
 @cli.group()
 def customer():
     """Groupe de commandes pour gérer les clients."""
     pass
+
 
 @customer.command("create")
 @require_token
@@ -37,7 +39,7 @@ def create_customer():
 
     employee_number = decode_access_token(load_token())["emp_number"]
     employee_id = crud_employee.get_employees(db, {"employee_number": employee_number}, None)[0].id
-    
+
     data = {
         "first_name": first_name,
         "last_name": last_name,
@@ -46,12 +48,13 @@ def create_customer():
         "company": company,
         "sale_contact_id": employee_id
     }
-       
+
     customer = safe_execute(crud_customer.create_customer, db, data)
-    
+
     if customer:
         views.display_customers([customer], "create")
-        
+
+
 @customer.command("list")
 @click.option(
     "--filter", "-f",
@@ -69,13 +72,14 @@ def get_customers(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-    
+
     print(f"Filtres appliqués : {filters}")
     print(f"Tris appliqués : {sorts}")
-    
+
     customers = safe_execute(crud_customer.get_customers, db, filters, sorts)
     views.display_customers(customers, "list")
-    
+
+
 @customer.command("update")
 @click.argument("customer_id", type=int)
 @click.argument("update", nargs=-1, required=True)
@@ -88,13 +92,14 @@ def update_customer(customer_id, update):
     Exemple : customer update 1 first_name=Alice last_name="Dupont Martin"
     """
     updates = attr_val_to_dict(update)
-    
+
     req_emp_num = decode_access_token(load_token())["emp_number"]
 
     customer = safe_execute(crud_customer.update_customer, db, customer_id, updates, req_emp_num)
     if customer:
         views.display_customers([customer], "update")
-        
+
+
 @customer.command("update-contact")
 @click.argument("customer_id", type=int)
 @click.argument("sale_contact")
@@ -109,7 +114,8 @@ def update_customer_sale_contact(customer_id, sale_contact):
     customer = safe_execute(crud_customer.update_customer_sale_contact, db, customer_id, sale_contact)
     if customer:
         views.display_customers([customer], "update")
-        
+
+
 @customer.command("delete")
 @click.argument("customer_id")
 @require_token
@@ -117,15 +123,16 @@ def update_customer_sale_contact(customer_id, sale_contact):
 def delete_customer(customer_id):
     """Supprime un client."""
     customers = safe_execute(crud_customer.get_customers, db, {"id": customer_id}, None)
-    
+
     try:
         customer = customers[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun client trouvé avec l'ID {customer_id}.")
         return
 
     while True:
-        confirmation = input(f">>> Êtes-vous sûr de vouloir supprimer le client {customer.first_name} {customer.last_name} ? (oui/non) ")
+        confirmation = input(f">>> Êtes-vous sûr de vouloir supprimer le client "
+                             f"{customer.first_name} {customer.last_name} ? (oui/non) ")
         if confirmation.lower() == "oui":
             views.display_customers([customer], "delete")
             safe_execute(crud_customer.delete_customer, db, customer)

@@ -12,6 +12,7 @@ from app.db.database import Session
 
 db = Session()
 
+
 @cli.command("login")
 def login():
     """Se connecter en tant qu'employé."""
@@ -22,7 +23,7 @@ def login():
     if not employees:
         print(f"Aucun employé trouvé avec le numéro {emp_number}.")
         return
-    
+
     user = employees[0]
 
     if verify_password(password, user.password):
@@ -31,6 +32,7 @@ def login():
         save_token_locally(token)
     else:
         print("Échec de la connexion : numéro d'employé ou mot de passe incorrect.")
+
 
 @cli.command("change-password")
 @require_token
@@ -43,16 +45,16 @@ def change_password():
 
     try:
         employee = employees[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun employé trouvé avec le numéro {employee_number}.")
         return
-    
+
     previous_password = getpass(">>> Mot de passe précédent : ")
-    
+
     if not verify_password(previous_password, employee.password):
         print("Échec de la mise à jour du mot de passe : mot de passe précédent incorrect.")
         return
-    
+
     while True:
         new_password = getpass(">>> Nouveau mot de passe : ")
         confirm_password = getpass(">>> Confirmer le nouveau mot de passe : ")

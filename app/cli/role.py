@@ -7,10 +7,12 @@ from app.ui import views
 
 db = Session()
 
+
 @cli.group()
 def role():
     """Groupe de commandes pour gérer les rôles"""
     pass
+
 
 @role.command("list")
 @require_token

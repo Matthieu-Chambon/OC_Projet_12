@@ -1,5 +1,6 @@
 from app.models.models import Customer, Employee
 
+
 def create_customer(session, data):
     """Crée un nouveau client."""
     try:
@@ -10,7 +11,8 @@ def create_customer(session, data):
         return new_customer
     except Exception as e:
         raise ValueError(f"Erreur lors de la création du client : {e}")
-    
+
+
 def get_customers(session, filters={}, sorts={}):
     """Récupère la liste des clients en fonction des critères du filtrage et du tri."""
     query = session.query(Customer)
@@ -18,13 +20,13 @@ def get_customers(session, filters={}, sorts={}):
     for attr, value in filters.items():
         if not hasattr(Customer, attr):
             raise ValueError(f"L'attribut '{attr}' n'existe pas dans le modèle Customer.")
-        
+
         column = getattr(Customer, attr)
 
         if value.lower() in ("none", "null"):
             query = query.filter(column.is_(None))
             continue
-        
+
         if value.lower() in ("true", "false"):
             query = query.filter(column.is_(value.lower() == "true"))
             continue
@@ -35,9 +37,9 @@ def get_customers(session, filters={}, sorts={}):
         for attr, order in sorts.items():
             if not hasattr(Customer, attr):
                 raise ValueError(f"L'attribut '{attr}' n'existe pas dans le modèle Customer.")
-            
+
             column = getattr(Customer, attr)
-            
+
             if order == "asc":
                 query = query.order_by(column.asc())
             elif order == "desc":
@@ -45,28 +47,30 @@ def get_customers(session, filters={}, sorts={}):
 
     return query.all()
 
+
 def update_customer(session, customer_id, updates, req_emp_num):
     """Met à jour un client."""
     customer = session.query(Customer).filter(Customer.id == customer_id).first()
 
     if not customer:
         raise ValueError(f"Aucun client trouvé avec l'ID {customer_id}.")
-    
+
     employee = session.query(Employee).filter(Employee.employee_number == req_emp_num).first()
-    
+
     if customer.sale_contact:
         if customer.sale_contact.employee_number != req_emp_num and employee.role.name != "Management":
-            raise ValueError(f"Vous n'êtes pas autorisé à modifier ce client.")
+            raise ValueError("Vous n'êtes pas autorisé à modifier ce client.")
     else:
         if employee.role.name != "Management":
-            raise ValueError(f"Seul un manager peut modifier le client s'il n'a pas de commercial associé.")
+            raise ValueError("Seul un manager peut modifier le client s'il n'a pas de commercial associé.")
 
     for attribute, value in updates.items():
         if not hasattr(Customer, attribute):
             raise ValueError(f"L'attribut '{attribute}' n'existe pas dans le modèle Customer.")
 
         if attribute == "sale_contact_id":
-            raise ValueError(f"Veuillez utiliser la commande 'customer update-contact' pour mettre à jour le contact commercial.")
+            raise ValueError("Veuillez utiliser la commande 'customer update-contact' "
+                             "pour mettre à jour le contact commercial.")
 
         if attribute not in ['first_name', 'last_name', 'email', 'phone', 'company']:
             raise ValueError(f"L'attribut '{attribute}' n'est pas modifiable.")
@@ -76,6 +80,7 @@ def update_customer(session, customer_id, updates, req_emp_num):
     session.commit()
     session.refresh(customer)
     return customer
+
 
 def update_customer_sale_contact(session, customer_id, sale_contact):
     """Met à jour le contact commercial d'un client."""
@@ -87,10 +92,11 @@ def update_customer_sale_contact(session, customer_id, sale_contact):
         raise ValueError(f"Aucun employé trouvé avec le numéro ou l'ID {sale_contact}.")
 
     if employee.role.name != "Commercial":
-        raise ValueError(f"L'employé {employee.first_name} {employee.last_name} ({employee.employee_number}) n'est pas un commercial.")
+        raise ValueError(f"L'employé {employee.first_name} {employee.last_name} ({employee.employee_number}) "
+                         "n'est pas un commercial.")
 
     customer = session.query(Customer).filter(Customer.id == customer_id).first()
-    
+
     if not customer:
         raise ValueError(f"Aucun client trouvé avec l'ID {customer_id}.")
 
@@ -103,6 +109,7 @@ def update_customer_sale_contact(session, customer_id, sale_contact):
         session.commit()
 
     return customer
+
 
 def delete_customer(session, customer):
     """Supprime un client."""

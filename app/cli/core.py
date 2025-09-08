@@ -10,10 +10,12 @@ import sentry_sdk
 
 db = Session()
 
+
 @click.group()
 def cli():
     """Epic Events CLI - Gestion complète des rôles, employés, clients, contrats et événements"""
     pass
+
 
 def prepare_sentry_scope(extra_context=None):
     """Prépare le contexte Sentry pour la capture des erreurs."""
@@ -40,6 +42,7 @@ def prepare_sentry_scope(extra_context=None):
             for key, value in extra_context.items():
                 scope.set_extra(key, str(value))
 
+
 def safe_execute(func, *args, **kwargs):
     """Exécute une fonction en toute sécurité et capture les exceptions."""
     try:
@@ -58,6 +61,7 @@ def safe_execute(func, *args, **kwargs):
         sentry_sdk.capture_exception(e)
         return None
 
+
 def input_with_limit(prompt, limit):
     """Demande une entrée utilisateur avec une limite de caractères."""
     while True:
@@ -66,6 +70,7 @@ def input_with_limit(prompt, limit):
             print(f"Veuillez entrer un texte de moins de {limit} caractères.")
         else:
             return value
+
 
 def attr_val_to_dict(attr_val_pairs):
     """Convertit une liste de paires attribut=valeur en dictionnaire."""
@@ -79,6 +84,7 @@ def attr_val_to_dict(attr_val_pairs):
 
     return attrs
 
+
 def sort_to_dict(sort):
     """Convertit une liste de critères de tri en dictionnaire."""
     sorts = {}
@@ -89,7 +95,7 @@ def sort_to_dict(sort):
         attribute, order = s.split("=", 1)
         if order not in ["asc", "desc"]:
             raise click.BadParameter("L'ordre de tri doit être 'asc' ou 'desc'.")
-        
+
         sorts[attribute] = order
 
     return sorts

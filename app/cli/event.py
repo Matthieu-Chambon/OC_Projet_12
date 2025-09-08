@@ -14,10 +14,12 @@ from datetime import datetime
 
 db = Session()
 
+
 @cli.group()
 def event():
     """Groupe de commandes pour gérer les événements."""
     pass
+
 
 @event.command("create")
 @require_token
@@ -28,29 +30,29 @@ def create_event():
     employee = safe_execute(crud_employee.get_employees, db, {"employee_number": req_emp_num}, None)[0]
 
     name = input_with_limit("Nom de l'événement : ", 100)
-    
+
     while True:
         contract_id = input(">>> ID du contrat associé à l'événement : ")
 
         contracts = safe_execute(crud_contract.get_contracts, db, {"id": contract_id}, None)
-        
+
         try:
             contract = contracts[0]
-        except Exception as e:
+        except Exception:
             print(f"Aucun contrat trouvé avec l'ID {contract_id}.")
             continue
-        
+
         if contract.event:
             print(f"Un événement est déjà associé au contrat {contract_id}.")
-            continue 
+            continue
 
         if contract.sale_contact:
             if contract.sale_contact.employee_number != req_emp_num and employee.role.name != "Management":
-                print(f"Vous n'êtes pas autorisé à créer un événement pour ce contrat.")
+                print("Vous n'êtes pas autorisé à créer un événement pour ce contrat.")
                 continue
         else:
             if employee.role.name != "Management":
-                print(f"Seul un manager peut créer un événement si le contrat n'a pas de commercial associé.")
+                print("Seul un manager peut créer un événement si le contrat n'a pas de commercial associé.")
                 continue
 
         if contract.signed is False:
@@ -58,7 +60,7 @@ def create_event():
             continue
 
         break
-    
+
     while True:
         start_date = input(">>> Date de début de l'événement (YYYY-MM-DD HH:MM) : ")
 
@@ -68,9 +70,9 @@ def create_event():
         except ValueError:
             print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
-        
+
         break
-    
+
     while True:
         end_date = input(">>> Date de fin de l'événement (YYYY-MM-DD HH:MM) : ")
 
@@ -80,15 +82,15 @@ def create_event():
         except ValueError:
             print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
-        
+
         if end_date <= start_date:
             print("La date de fin doit être postérieure à la date de début.")
             continue
 
         break
-    
+
     location = input_with_limit("Lieu de l'événement : ", 100)
-    
+
     while True:
         attendees = input(">>> Nombre d'invités attendus : ")
 
@@ -97,15 +99,15 @@ def create_event():
         except ValueError:
             print("Veuillez entrer un nombre valide.")
             continue
-        
+
         if attendees < 0:
             print("Veuillez entrer un nombre d'invités positif.")
             continue
 
         break
-    
+
     notes = input_with_limit("Remarques supplémentaires : ", 255)
-    
+
     data = {
         "name": name,
         "contract_id": contract_id,
@@ -119,6 +121,7 @@ def create_event():
     event = safe_execute(crud_event.create_event, db, data)
     if event:
         views.display_events([event], "create")
+
 
 @event.command("list")
 @click.option(
@@ -137,13 +140,14 @@ def get_events(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-    
+
     print(f"Filtres appliqués : {filters}")
     print(f"Tris appliqués : {sorts}")
 
     events = safe_execute(crud_event.get_events, db, filters, sorts)
     views.display_events(events, "list")
-    
+
+
 @event.command("update")
 @click.argument("event_id", type=int)
 @click.argument("update", nargs=-1, required=True)
@@ -163,6 +167,7 @@ def update_event(event_id, update):
     if event:
         views.display_events([event], "update")
 
+
 @event.command("update-contact")
 @click.argument("event_id", type=int)
 @click.argument("support_contact")
@@ -178,6 +183,7 @@ def update_event_support_contact(event_id, support_contact):
     if event:
         views.display_events([event], "update")
 
+
 @event.command("delete")
 @click.argument("event_id")
 @require_token
@@ -188,7 +194,7 @@ def delete_event(event_id):
 
     try:
         event = events[0]
-    except Exception as e:
+    except Exception:
         print(f"Aucun événement trouvé avec l'ID {event_id}.")
         return
 

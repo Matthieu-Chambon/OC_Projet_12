@@ -2,6 +2,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
+
 def display_roles(roles):
     """Affiche la liste des rôles."""
     table = Table(title="\n:lock: Liste des rôles :")
@@ -22,10 +23,11 @@ def display_roles(roles):
     console.print(table)
     console.print("\n")
 
+
 def display_employees(employees, context):
     """Affiche la liste des employés."""
     console = Console()
-    
+
     if not employees:
         console.print(Text("\nAucun employé trouvé.", style="bold red"))
         return
@@ -67,6 +69,7 @@ def display_employees(employees, context):
     console.print(table)
     console.print("\n")
 
+
 def display_customers(customers, context):
     """Affiche la liste des clients."""
     console = Console()
@@ -74,7 +77,7 @@ def display_customers(customers, context):
     if not customers:
         console.print(Text("Aucun client trouvé.", style="bold red"))
         return
-   
+
     if context == "create":
         table = Table(title="\n:heavy_plus_sign: Nouveau client créé :")
     elif context == "list":
@@ -98,7 +101,7 @@ def display_customers(customers, context):
 
     for customer in customers:
         sc = customer.sale_contact
-        
+
         if sc is not None:
             sale_contact_id = f"{str(customer.sale_contact_id)} ({sc.first_name} {sc.last_name} - {sc.employee_number})"
         else:
@@ -115,14 +118,15 @@ def display_customers(customers, context):
             customer.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             customer.updated_at.strftime("%Y-%m-%d %H:%M:%S")
         )
-        
+
     table.caption = f"{len(customers)} résultat(s)"
     table.caption_style = "italic white"
     table.caption_justify = "right"
 
     console.print(table)
     console.print("\n")
-    
+
+
 def display_contracts(contracts, context):
     """Affiche la liste des contrats."""
     console = Console()
@@ -130,7 +134,7 @@ def display_contracts(contracts, context):
     if not contracts:
         console.print(Text("Aucun contrat trouvé.", style="bold red"))
         return
-    
+
     if context == "create":
         table = Table(title="\n:heavy_plus_sign: Nouveau contrat créé :")
     elif context == "list":
@@ -140,7 +144,6 @@ def display_contracts(contracts, context):
     elif context == "delete":
         table = Table(title="\n:heavy_minus_sign: Contrat supprimé :")
 
-    
     table.title_style = "bold"
 
     table.add_column("id", justify="center", style="red")
@@ -154,7 +157,7 @@ def display_contracts(contracts, context):
     for contract in contracts:
         cu = contract.customer
         sc = contract.sale_contact
-        
+
         if sc is not None:
             sale_contact_id = f"{str(contract.sale_contact_id)} ({sc.first_name} {sc.last_name} - {sc.employee_number})"
         else:
@@ -177,6 +180,7 @@ def display_contracts(contracts, context):
     console.print(table)
     console.print("\n")
 
+
 def display_events(events, context):
     """Affiche la liste des événements."""
     console = Console()
@@ -184,7 +188,7 @@ def display_events(events, context):
     if not events:
         console.print(Text("Aucun événement trouvé.", style="bold red"))
         return
-    
+
     if context == "create":
         table = Table(title="\n:heavy_plus_sign: Nouvel événement créé :")
     elif context == "list":
@@ -214,7 +218,8 @@ def display_events(events, context):
         sc = event.support_contact
 
         if sc is not None:
-            support_contact_id = f"{str(event.support_contact_id)} ({sc.first_name} {sc.last_name} - {sc.employee_number})"
+            support_contact_id = f"{str(event.support_contact_id)} " \
+                                 f"({sc.first_name} {sc.last_name} - {sc.employee_number})"
         else:
             support_contact_id = "None"
 

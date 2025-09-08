@@ -1,6 +1,5 @@
-import pytest
 from app.crud import role as crud_role
-from app.models.models import Role
+
 
 def test_get_roles(session):
     """Vérifie que get_roles renvoie les rôles existants."""
