@@ -165,13 +165,17 @@ events = [
     )
 ]
 
-
 # Insère les données
 db.add_all(employees)
 db.add_all(customers)
 db.add_all(contracts)
 db.add_all(events)
 db.commit()
-db.close()
 
-print("Données de test insérées avec succès.")
+print("Données de test insérées avec succès !")
+print("\nVous pouvez maintenant vous connecter avec les employés suivants :")
+for employee in employees:
+    print(f"- {employee.employee_number} : password    "
+          f"({employee.first_name} {employee.last_name} - {employee.role.name})")
+
+db.close()
