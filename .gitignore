@@ -4,3 +4,4 @@ venv/
 .session_token
 .coverage
 htmlcov/
+flake-report/
