@@ -1,0 +1,16 @@
+[flake8]
+max-line-length = 120
+
+# Répertoires ou fichiers à exclure
+exclude =
+    env,
+    venv,
+    .git,
+    __pycache__,
+    htmlcov,
+    flake-report,
+    requirements,
+
+# Format du rapport
+format = html
+htmldir = flake-report
