@@ -7,7 +7,6 @@ def create_employee(session, data):
     """Crée un nouvel employé."""
     try:
         temp_number = "TEMP-" + uuid4().hex
-        print(f"Création d'un nouvel employé avec le numéro temporaire : {temp_number}")
         new_employee = Employee(employee_number=temp_number, **data)
         new_employee.password = hash_password(new_employee.password)
 
