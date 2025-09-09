@@ -95,7 +95,7 @@ def update_contract(session, contract_id, updates, req_emp_num):
                     value = True
                 elif value.lower() in ["non", "n", "no", "0", "false"]:
                     if contract.event:
-                        raise ValueError("Le contrat est lié à un événement " /
+                        raise ValueError("Le contrat est lié à un événement "
                                          "et ne peut pas être marqué comme non signé.")
                     value = False
                 else:
