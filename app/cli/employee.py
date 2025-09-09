@@ -85,9 +85,6 @@ def get_employees(filter, sort):
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
 
-    print(f"Filtres appliqués : {filters}")
-    print(f"Tris appliqués : {sorts}")
-
     employees = safe_execute(crud_employee.get_employees, db, filters, sorts)
     views.display_employees(employees, "list")
 
@@ -104,8 +101,6 @@ def update_employee(employee, update):
     Exemple : employee update EMP0001 first_name=Alice last_name="Dupont Martin"
     """
     updates = attr_val_to_dict(update)
-
-    print(updates)
 
     employee = safe_execute(crud_employee.update_employee, db, employee, updates)
     if employee:

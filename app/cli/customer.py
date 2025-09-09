@@ -73,9 +73,6 @@ def get_customers(filter, sort):
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
 
-    print(f"Filtres appliqués : {filters}")
-    print(f"Tris appliqués : {sorts}")
-
     customers = safe_execute(crud_customer.get_customers, db, filters, sorts)
     views.display_customers(customers, "list")
 

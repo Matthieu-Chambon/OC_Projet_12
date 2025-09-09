@@ -48,7 +48,6 @@ def test_command_event_list_filters_and_sorts(runner):
     """Test de la commande event list avec des filtres et des tris."""
     runner.invoke(cli, ["login"], input="EMP0002\n")  # Employé commercial
     result = runner.invoke(event, ["list", "--filter", "support_contact_id=None", "--sort", "start_date=asc"])
-    print(result.output)
     assert result.exit_code == 0
     assert "2 résultat(s)" in result.output
     event1_index = result.output.index("Réun")  # Les mots sont tronqués dans l'affichage via les tests

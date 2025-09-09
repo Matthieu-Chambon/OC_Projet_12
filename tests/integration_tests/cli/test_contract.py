@@ -45,7 +45,6 @@ def test_command_contract_list_filters_and_sorts(runner):
     """Test de la commande contract list avec des filtres et des tris."""
     runner.invoke(cli, ["login"], input="EMP0001\n")  # Employé commercial
     result = runner.invoke(contract, ["list", "--filter", "sale_contact_id=1", "--sort", "total_amount=desc"])
-    print(result.output)
     assert result.exit_code == 0
     assert "3 résultat(s)" in result.output
     index = [

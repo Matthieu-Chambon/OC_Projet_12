@@ -33,7 +33,6 @@ def create_contract():
             continue
 
         customer = customers[0]
-        print(customer.id)
         break
 
     sale_contact_id = customer.sale_contact_id
@@ -55,7 +54,6 @@ def create_contract():
             print("Le montant total ne peut pas dépasser 99 999 999,99€.")
             continue
 
-        print(total_amount)
         break
 
     while True:
@@ -78,7 +76,6 @@ def create_contract():
             print("Le montant restant ne peut pas être supérieur au montant total.")
             continue
 
-        print(remaining_amount)
         break
 
     while True:
@@ -128,9 +125,6 @@ def get_contracts(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-
-    print(f"Filtres appliqués : {filters}")
-    print(f"Tris appliqués : {sorts}")
 
     contracts = safe_execute(crud_contract.get_contracts, db, filters, sorts)
     views.display_contracts(contracts, "list")

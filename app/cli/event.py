@@ -66,7 +66,6 @@ def create_event():
 
         try:
             start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
-            print(start_date)
         except ValueError:
             print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
@@ -78,7 +77,6 @@ def create_event():
 
         try:
             end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
-            print(end_date)
         except ValueError:
             print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
             continue
@@ -140,9 +138,6 @@ def get_events(filter, sort):
 
     filters = attr_val_to_dict(filter)
     sorts = sort_to_dict(sort)
-
-    print(f"Filtres appliqués : {filters}")
-    print(f"Tris appliqués : {sorts}")
 
     events = safe_execute(crud_event.get_events, db, filters, sorts)
     views.display_events(events, "list")
