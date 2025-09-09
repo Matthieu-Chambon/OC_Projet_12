@@ -62,23 +62,23 @@ def create_event():
         break
 
     while True:
-        start_date = input(">>> Date de début de l'événement (YYYY-MM-DD HH:MM) : ")
+        start_date = input(">>> Date de début de l'événement (YYYY-MM-DD HH:MM:SS) : ")
 
         try:
-            start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M")
+            start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
+            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM:SS.")
             continue
 
         break
 
     while True:
-        end_date = input(">>> Date de fin de l'événement (YYYY-MM-DD HH:MM) : ")
+        end_date = input(">>> Date de fin de l'événement (YYYY-MM-DD HH:MM:SS) : ")
 
         try:
-            end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
         except ValueError:
-            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM.")
+            print("Format de date invalide. Veuillez utiliser le format YYYY-MM-DD HH:MM:SS.")
             continue
 
         if end_date <= start_date:

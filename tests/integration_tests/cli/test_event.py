@@ -5,7 +5,7 @@ from app.cli.event import event
 def test_command_event_create(runner):
     """Test de la commande event create"""
     runner.invoke(cli, ["login"], input="EMP0002\n")  # Employé commercial
-    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00\n2023-09-15 12:00\n"
+    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00:00\n2023-09-15 12:00:00\n"
                                                     "Salle A\n5\nVenir avec le rapport de vente\n")
     assert result.exit_code == 0
     assert "Nouvel événement créé" in result.output
@@ -13,7 +13,7 @@ def test_command_event_create(runner):
 
 def test_command_event_create_unauthenticated(runner):
     """Test de la commande event create sans authentification."""
-    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00\n2023-09-15 12:00\n"
+    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00:00\n2023-09-15 12:00:00\n"
                                                     "Salle A\n5\nVenir avec le rapport de vente\n")
     assert result.exit_code == 0
     assert "Aucun token trouvé." in result.output
@@ -22,7 +22,7 @@ def test_command_event_create_unauthenticated(runner):
 def test_command_event_create_unauthorized(runner):
     """Test de la commande event create sans autorisation."""
     runner.invoke(cli, ["login"], input="EMP0003\n")  # Employé support (non autorisé)
-    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00\n2023-09-15 12:00\n"
+    result = runner.invoke(event, ["create"], input="Réunion de suivi\n5\n2023-09-15 10:00:00\n2023-09-15 12:00:00\n"
                                                     "Salle A\n5\nVenir avec le rapport de vente\n")
     assert result.exit_code == 0
     assert "Accès refusé" in result.output
